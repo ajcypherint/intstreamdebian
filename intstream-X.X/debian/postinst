@@ -5,7 +5,6 @@ base_dir=/opt/
 #sudo ln -sf /etc/nginx/sites-available/$dns_name /etc/nginx/sites-enabled/$dns_name
 sudo systemctl restart nginx
 
-
 echo "------"
 echo " create database"
 source /etc/intstream/environment.conf
