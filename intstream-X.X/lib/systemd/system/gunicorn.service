@@ -1,0 +1,14 @@
+[Unit]
+Description=gunicorn service
+After=network.target
+
+[Service]
+User=intstream
+EnvironmentFile=/etc/intstream/environment.conf
+Group=www-data
+WorkingDirectory=/opt/intstream/backend
+ExecStart=/opt/intstream/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/opt/intstream/awesome.sock backend.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+

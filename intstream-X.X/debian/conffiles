@@ -1,0 +1,3 @@
+/lib/systemd/system/celeryworker.service
+/lib/systemd/system/celerybeat.service
+/lib/systemd/system/gunicorn.service

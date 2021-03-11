@@ -1,0 +1,12 @@
+[Unit]
+Description=celery worker service
+After=network.target
+
+[Service]
+User=intstream
+EnvironmentFile=/etc/intstream/environment.conf
+ExecStart=/opt/intstream/venv/bin/celery  --workdir=/opt/intstream/backend -A backend.celery:celery_app worker -l info
+
+[Install]
+WantedBy=multi-user.target
+

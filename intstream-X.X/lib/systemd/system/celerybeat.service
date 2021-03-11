@@ -1,0 +1,14 @@
+[Unit]
+Description=celery beat service
+After=network.target
+
+[Service]
+User=intstream
+EnvironmentFile=/etc/intstream/environment.conf
+Group=www-data
+WorkingDirectory=/opt/intstream
+ExecStart=/opt/intstream/venv/bin/celery --workdir=/opt/intstream/backend  beat  -A backend.celery:celery_app -l info
+
+[Install]
+WantedBy=multi-user.target
+

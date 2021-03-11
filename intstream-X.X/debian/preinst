@@ -1,0 +1,67 @@
+#!/bin/bash
+set -e
+
+
+#todo(aj)
+# create intstream users w/out login
+
+#standalone installation script
+base_dir=/opt/
+export VIRTUAL_ENV="$basedir/intstream/venv"
+echo "------"
+echo "create media dir"
+mkdir "$base_dir/intstream/media" -p
+
+#python
+echo "------"
+echo " install pipenv"
+
+sudo pip3 install pipenv 
+
+echo "------"
+echo " create pipenv and install dependencies"
+cd "$base_dir/intstream/"
+pipenv --python /usr/bin/python3.6 
+pipenv install
+venvpath="$(pipenv --venv)"
+
+res=`sudo -u postgres psql -U postgres -d postgres -tc "SELECT 1 FROM pg_user WHERE usename = 'intstream'" | grep -q 1;echo $?`
+if [ "$res" -eq "0" ]; then
+    echo "intstream user already exists"
+    # use below to alter if need be
+    #sudo -u postgres psql -U postgres -d postgres -c "alter user intstream with password '$password';"
+else
+# ONLY create first time. 
+    echo "creating intstream user"
+    sudo -u postgres psql -U postgres -d postgres -c "CREATE ROLE intstream LOGIN PASSWORD '$password';"
+fi
+
+resdb=`sudo -u postgres psql -U postgres -c "SELECT FROM pg_database WHERE datname = 'intstream'" | grep -q 1;echo $?`
+if [ "$resdb" -eq "0" ]; then
+    echo "database intstream exists"
+else
+    echo "create database intstream"
+    sudo -u postgres psql -U postgres -c "create database intstream";
+fi
+
+
+# conf file in deb; to avoid rewriting
+echo "------"
+echo " gunicorn setup"
+#gunicorn
+curdir=$(pwd) #base dir + intstream
+
+email_host=${EMAIL_HOST:=""}
+email_port=${EMAIL_PORT:=""}
+email_host_user=${EMAIL_HOST_USER:=""}
+email_host_password=${EMAIL_HOST_PASSWORD:=""}
+#change to use a single environment file instead; that way this won't get stomped.
+#change $USER to a specific user we create; like intstream
+#todo just write out environment.conf file
+sed -i -e "s/\${postgres_pw}/$password/g\n" \
+    -e "s/\${email_host}/$email_host/g"  \
+    -e "s/\${email_port}/$email_port/g"  \
+    -e "s/\${email_user}/$email_user/g"  \
+    -e "s/\${email_host_password}/$email_host_password/g"  \
+     ./etc/intstream/environment.conf
+
