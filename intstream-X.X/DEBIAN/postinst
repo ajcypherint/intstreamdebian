@@ -1,0 +1,92 @@
+#!/bin/bash
+set -e
+set -x
+
+! useradd -r intstream 
+sudo chown intstream:intstream /usr/share/intstream/backend/media
+sudo mkhomedir_helper intstream
+
+USERNAME=intstream
+# install into .venv
+export PIPENV_VENV_IN_PROJECT=1
+
+#python
+echo "--version10----"
+echo "------"
+echo " install pipenv"
+sudo pip3 install pipenv 
+
+echo "------"
+echo " create pipenv and install dependencies"
+cd "/usr/share/intstream/"
+pipenv --python /usr/bin/python3.6 
+pipenv install
+venvpath="$(pipenv --venv)"
+
+res=`sudo -u postgres psql -U postgres -d postgres -tc "SELECT 1 FROM pg_user WHERE usename = 'intstream'" | grep -q 1;echo $?`
+if [ "$res" -eq "0" ]; then
+    echo "intstream user already exists"
+    # use below to alter the password if you need to 
+    # password=$(trap - PIPE ; cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1) 
+    # sudo -u postgres psql -U postgres -d postgres -c "alter user intstream with password '$password';"
+else
+# ONLY create first time. 
+    echo "creating intstream user"
+    password=$(trap - PIPE ; cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1) 
+    sudo -u postgres psql -U postgres -d postgres -c "CREATE ROLE intstream LOGIN PASSWORD '$password';"
+    #write password to environment.conf
+    sudo sed -i -e "s/\${postgres_pw}/$password/g" /etc/intstream/environment.conf
+fi
+
+resdb=`sudo -u postgres psql -U postgres -c "SELECT FROM pg_database WHERE datname = 'intstream'" | grep -q 1;echo $?`
+if [ "$resdb" -eq "0" ]; then
+    echo "database intstream exists"
+else
+    echo "create database intstream"
+    sudo -u postgres psql -U postgres -c "create database intstream";
+fi
+
+
+#prompt on install for this info
+#sudo ln -sf /etc/nginx/sites-available/$dns_name /etc/nginx/sites-enabled/$dns_name
+sudo systemctl restart nginx
+
+echo "------"
+echo " create database"
+export $(grep -v '^#' /etc/intstream/environment.conf | xargs -d '\n')
+cd "/usr/share/intstream/backend/"
+pipenv run python manage.py migrate
+echo "------"
+echo " create celery cache backend"
+pipenv run python manage.py migrate django_celery_results
+pipenv run python manage.py createcachetable
+
+echo "------"
+echo " create secret key"
+pipenv run python manage.py generate_secret_key --replace 
+
+echo "------"
+echo " collect static for backend to /usr/share/intstream/backend/"
+pipenv run python manage.py collectstatic --noinput
+
+
+echo "------"
+echo " npm install"
+cd "/usr/share/intstream/frontend/"
+sudo npm install
+
+echo "------"
+echo " npm build"
+npm run build
+
+set -x
+exit; # exit intstream user
+#todo move file to /etc/rc.local
+sudo bash -c 'cat "/usr/share/intstream/utility/rc.local" >> /etc/rc.local' 
+
+# pyspark requires java 1.8 
+sudo apt -qq install  openjdk-8-jdk
+#https://stackoverflow.com/questions/53583199/pyspark-error-unsupported-class-file-major-version-55
+sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+
+sudo chown -R root /etc/intstream

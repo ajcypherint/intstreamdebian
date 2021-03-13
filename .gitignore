@@ -1,7 +1,2 @@
-intstream_*
-intstream-X.X/debian/.debhelper/
-intstream-X.X/debian/debhelper-build-stamp
-intstream-X.X/debian/intstream.postinst.debhelper
-intstream-X.X/debian/intstream.postrm.debhelper
-intstream-X.X/debian/intstream.prerm.debhelper
-
+intstream.tar.gz
+intstream-1.0*
