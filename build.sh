@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 set -x
 
 if [ -z "$1" ]
@@ -18,9 +18,8 @@ fi
 
 cd ../intstream/
 tar -X .gitignore --exclude=*_pycache_* --exclude=intstream.tar.gz -zcvf intstream.tar.gz *
-mv intstream.tar.gz ../debintstream/
-gzip change
-cd ../debintstream/
+mv intstream.tar.gz ../debian/
+cd ../debian/
 
 VERSION="$1"
 RELEASE="$2"
@@ -35,6 +34,12 @@ sed -i -e "s/\${release}/$RELEASE/g" $FOLDER/DEBIAN/control
 gzip -kf -S .Debian.gz changelog  
 cp changelog.Debian.gz $FOLDER/usr/share/doc/intstream/
 tar -xf intstream.tar.gz --directory $FOLDER/usr/share/intstream
+
+sed -i -e 's/\${cwd}/\/usr\/share/g' $FOLDER/usr/share/intstream/utility/intstream
+sed -i -e 's/\${server_name}/server_name _/g' $FOLDER/usr/share/intstream/utility/intstream
+
+mv $FOLDER/usr/share/intstream/utility/intstream $FOLDER/etc/nginx/sites-available/intstream.conf
+
 chown -R root:root $FOLDER
 
 dpkg-deb --build $FOLDER
