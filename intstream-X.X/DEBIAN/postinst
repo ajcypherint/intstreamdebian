@@ -14,13 +14,18 @@ export PIPENV_VENV_IN_PROJECT=1
 echo "--version10----"
 echo "------"
 echo " install pipenv"
-sudo pip3 install pipenv 
+sudo pip3 install --upgrade pipenv 
 
 echo "------"
 echo " create pipenv and install dependencies"
 cd "/usr/share/intstream/"
-pipenv --python /usr/bin/python3.6 
-pipenv install
+
+pipenv --venv # Check if virtualenv exists
+NO_VENV=$? # Store returned status code in var
+if [ $NO_VENV -eq 1 ]; then
+  pipenv --python /usr/bin/python3.6 
+fi
+pipenv update
 venvpath="$(pipenv --venv)"
 
 res=`sudo -u postgres psql -U postgres -d postgres -tc "SELECT 1 FROM pg_user WHERE usename = 'intstream'" | grep -q 1;echo $?`
@@ -47,8 +52,6 @@ else
 fi
 
 
-#prompt on install for this info
-#sudo ln -sf /etc/nginx/sites-available/$dns_name /etc/nginx/sites-enabled/$dns_name
 sudo systemctl restart nginx
 
 echo "------"
@@ -80,16 +83,19 @@ echo " npm build"
 npm run build
 
 set -x
-exit; # exit intstream user
 #todo move file to /etc/rc.local
 sudo bash -c 'cat "/usr/share/intstream/utility/rc.local" >> /etc/rc.local' 
 
 # pyspark requires java 1.8 
-sudo apt -qq install  openjdk-8-jdk
 #https://stackoverflow.com/questions/53583199/pyspark-error-unsupported-class-file-major-version-55
 sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
-sudo chown -R intstream /usr/share/intstream
+sudo chown intstream:intstream /usr/share/intstream/
+sudo chown intstream:intstream /usr/share/intstream/backend/
+sudo chown intstream:intstream /usr/share/intstream/backend/media
+sudo chown intstream:intstream /usr/share/intstream/backend/media/model_versions
+sudo chown intstream:intstream /usr/share/intstream/backend/media/celery_logs
+
 sudo systemctl enable celerybeat
 sudo systemctl enable gunicorn
 sudo systemctl enable celeryworker

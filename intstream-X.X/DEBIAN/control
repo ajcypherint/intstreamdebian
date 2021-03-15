@@ -6,5 +6,5 @@ Priority: optional
 Description:  intel analysis
   analyze incoming intel from rss and other sources
 Homepage: https://github.com/username/projectname
-Depends: nodejs, npm, python, git, python3 (>=3.5), python3-dev, redis-server, postgresql, nginx, python3-pip
+Depends: openjdk-8-jdk, nodejs, npm, python, git, python3 (>=3.5), python3-dev, redis-server, postgresql, nginx, python3-pip
 Maintainer: Aaron Jonen <aaron.jonen@cypherint.com>
