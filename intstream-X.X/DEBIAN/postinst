@@ -41,6 +41,11 @@ else
     sudo -u postgres psql -U postgres -d postgres -c "CREATE ROLE intstream LOGIN PASSWORD '$password';"
     #write password to environment.conf
     sudo sed -i -e "s/\${postgres_pw}/$password/g" /etc/intstream/environment.conf
+    pushd /usr/share/intstream/backend
+    echo "------"
+    echo " create secret key"
+    pipenv run python manage.py generate_secret_key --replace 
+    popd
 fi
 
 resdb=`sudo -u postgres psql -U postgres -c "SELECT FROM pg_database WHERE datname = 'intstream'" | grep -q 1;echo $?`
@@ -63,10 +68,6 @@ echo "------"
 echo " create celery cache backend"
 pipenv run python manage.py migrate django_celery_results
 pipenv run python manage.py createcachetable
-
-echo "------"
-echo " create secret key"
-pipenv run python manage.py generate_secret_key --replace 
 
 echo "------"
 echo " collect static for backend to /usr/share/intstream/backend/"
@@ -100,6 +101,6 @@ sudo systemctl enable celerybeat
 sudo systemctl enable gunicorn
 sudo systemctl enable celeryworker
 sudo systemctl daemon-reload
-sudo systemctl start celerybeat
-sudo systemctl start gunicorn
-sudo systemctl start celeryworker
+sudo systemctl restart celerybeat
+sudo systemctl restart gunicorn
+sudo systemctl restart celeryworker

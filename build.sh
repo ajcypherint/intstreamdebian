@@ -35,7 +35,7 @@ gzip -kf -S .Debian.gz changelog
 cp changelog.Debian.gz $FOLDER/usr/share/doc/intstream/
 tar -xf intstream.tar.gz --directory $FOLDER/usr/share/intstream
 
-sed -i -e 's/\${cwd}/\/usr\/share/intstream/g' $FOLDER/usr/share/intstream/utility/intstream
+sed -i -e 's/\${cwd}/\/usr\/share\/intstream/g' $FOLDER/usr/share/intstream/utility/intstream
 sed -i -e 's/\${server_name}/server_name _/g' $FOLDER/usr/share/intstream/utility/intstream
 
 mv $FOLDER/usr/share/intstream/utility/intstream $FOLDER/etc/nginx/sites-available/intstream.conf
