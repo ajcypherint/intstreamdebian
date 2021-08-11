@@ -1,7 +1,4 @@
 #!/bin/bash
-#####################
-# set working dir to location of build.sh to run this script
-####################
 set -e
 set -x
 
@@ -17,14 +14,12 @@ if [ -z "$2" ]
     exit 1
 fi
 
-
 ! rm intstream.tar.gz
-! rm -rf intstream/
-git clone https://github.com/ajcypherint/intstream.git
-cd ./intstream/
+
+cd ../intstream/
 tar -X .gitignore --exclude=*_pycache_* --exclude=intstream.tar.gz -zcvf intstream.tar.gz *
-mv intstream.tar.gz ../
-cd ..
+mv intstream.tar.gz ../debian/
+cd ../debian/
 
 VERSION="$1"
 RELEASE="$2"
