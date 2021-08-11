@@ -18,17 +18,19 @@ if [ -z "$2" ]
 fi
 
 
+VERSION="$1"
+RELEASE="$2"
+FOLDER=./intstream-"$VERSION"-"$RELEASE"
+
 ! rm intstream.tar.gz
 ! rm -rf intstream/
 git clone https://github.com/ajcypherint/intstream.git
+git checkout tags/$RELEASE
 cd ./intstream/
 tar -X .gitignore --exclude=*_pycache_* --exclude=intstream.tar.gz -zcvf intstream.tar.gz *
 mv intstream.tar.gz ../
 cd ..
 
-VERSION="$1"
-RELEASE="$2"
-FOLDER=./intstream-"$VERSION"-"$RELEASE"
 
 ! sudo rm -rf "$FOLDER"
 ! rm intstream-"$VERSION"-"$RELEASE".deb 
