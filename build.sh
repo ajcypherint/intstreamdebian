@@ -25,14 +25,14 @@ FOLDER=./intstream-"$VERSION"-"$RELEASE"
 ! rm intstream.tar.gz
 ! rm -rf intstream/
 git clone https://github.com/ajcypherint/intstream.git
-git checkout tags/$RELEASE
+git checkout tags/$VERSION
 cd ./intstream/
 tar -X .gitignore --exclude=*_pycache_* --exclude=intstream.tar.gz -zcvf intstream.tar.gz *
 mv intstream.tar.gz ../
 cd ..
 
 
-! sudo rm -rf "$FOLDER"
+! rm -rf "$FOLDER"
 ! rm intstream-"$VERSION"-"$RELEASE".deb 
 cp -r ./intstream-X.X $FOLDER
 sed -i -e "s/\${version}/$VERSION/g" $FOLDER/DEBIAN/control

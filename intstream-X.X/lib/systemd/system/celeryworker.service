@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=intstream
 EnvironmentFile=/etc/intstream/environment.conf
-ExecStart=/usr/share/intstream/.venv/bin/celery  --max-memory-per-child 24000 --workdir=/usr/share/intstream/backend -A backend.celery:celery_app worker -l info
+ExecStart=/usr/share/intstream/.venv/bin/celery  --workdir=/usr/share/intstream/backend -A backend.celery:celery_app worker -l info --max-memory-per-child 24000 
 
 [Install]
 WantedBy=multi-user.target
