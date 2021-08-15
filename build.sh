@@ -24,8 +24,7 @@ FOLDER=./intstream-"$VERSION"-"$RELEASE"
 
 ! rm intstream.tar.gz
 ! rm -rf intstream/
-git clone https://github.com/ajcypherint/intstream.git
-git checkout tags/$VERSION
+git clone --branch v$VERSION --depth 1 https://github.com/ajcypherint/intstream.git
 cd ./intstream/
 tar -X .gitignore --exclude=*_pycache_* --exclude=intstream.tar.gz -zcvf intstream.tar.gz *
 mv intstream.tar.gz ../
