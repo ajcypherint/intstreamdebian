@@ -97,6 +97,7 @@ sudo chown intstream:intstream /usr/share/intstream/backend/media
 sudo chown intstream:intstream /usr/share/intstream/backend/media/model_versions
 sudo chown intstream:intstream /usr/share/intstream/backend/media/celery_logs
 sudo chown intstream:intstream /var/lib/intstream_tmp
+sudo chown intstream:intstream /var/log/intstream
 
 sudo systemctl enable celerybeat
 sudo systemctl enable gunicorn

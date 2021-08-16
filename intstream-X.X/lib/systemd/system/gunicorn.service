@@ -7,7 +7,7 @@ User=intstream
 EnvironmentFile=/etc/intstream/environment.conf
 Group=www-data
 WorkingDirectory=/usr/share/intstream/backend
-ExecStart=/usr/share/intstream/.venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/usr/share/intstream/awesome.sock backend.wsgi:application
+ExecStart=/usr/share/intstream/.venv/bin/gunicorn --access-logfile /var/log/intstream/gunicorn.access.log --error-logfile /var/log/intstream/gunicorn.error.log --workers 3 --bind unix:/usr/share/intstream/awesome.sock backend.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
