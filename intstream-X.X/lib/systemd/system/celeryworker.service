@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=intstream
 EnvironmentFile=/etc/intstream/environment.conf
-ExecStart=/usr/share/intstream/.venv/bin/celery  --workdir=/usr/share/intstream/backend -A backend.celery:celery_app worker -l info --max-memory-per-child 24000 --max-tasks-per-child 2
+ExecStart=/usr/share/intstream/.venv/bin/celery  --workdir=/usr/share/intstream/backend -A backend.celery:celery_app worker -l info --logfile /var/log/intstream/celeryworker.log --max-memory-per-child 24000 --max-tasks-per-child 200 --time-limit 108000
 
 [Install]
 WantedBy=multi-user.target

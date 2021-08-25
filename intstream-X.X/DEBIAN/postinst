@@ -46,6 +46,8 @@ else
     echo " create secret key"
     pipenv run python manage.py generate_secret_key --replace 
     popd
+    echo "appending large page setting to rc.local"
+    sudo bash -c 'cat "/usr/share/intstream/utility/rc.local" >> /etc/rc.local' 
 fi
 
 resdb=`sudo -u postgres psql -U postgres -c "SELECT FROM pg_database WHERE datname = 'intstream'" | grep -q 1;echo $?`
@@ -82,10 +84,6 @@ sudo npm install
 echo "------"
 echo " npm build"
 npm run build
-
-set -x
-#todo move file to /etc/rc.local
-sudo bash -c 'cat "/usr/share/intstream/utility/rc.local" >> /etc/rc.local' 
 
 # pyspark requires java 1.8 
 #https://stackoverflow.com/questions/53583199/pyspark-error-unsupported-class-file-major-version-55
